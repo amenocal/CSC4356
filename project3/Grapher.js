@@ -1,11 +1,11 @@
-//HelloTriangle.js
+//Grapher.js
 //Vertex shader program
 var VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
     'varying mediump vec4 v_Color;\n' +
     'void main() {\n' +
-    '	v_Color = (a_Position + 1.0) / 2.0;\n' +
-    '  gl_Position = a_Position;\n' +
+    '   v_Color = (a_Position + 1.0) / 2.0;\n' +
+    '   gl_Position = a_Position;\n' +
     '}\n';
 
 //Fragment shader program
@@ -19,7 +19,7 @@ function main() {
 
     var canvas = document.getElementById('webgl');
     // Get the rendering context for WebGL
-    var gl = getWebGLContext(canvas, false);
+    var gl = getWebGLContext(canvas);
 
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
@@ -47,51 +47,63 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     //Draw a triangle
     gl.drawArrays(gl.TRIANGLES, 0, n);
+    //gl.drawArrays(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT,0);
 
     gl.enable(gl.DEPTH_TEST);
 }
 
 function initVertexBuffers(gl) {
 
-    var i, r, c, x, y, z,k;
+    var i, r, c, x, y, z, k;
     var verarray = new Array();
     var triarray = new Array();
 
     var n = 16;
-    k=0;
+
+    //Adding vertices [x,y,z] at row r, column c
     for (r = 0; r <= n; r++) {
         for (c = 0; c <= n; c++) {
             x = 2 * (c / (n - 1)) - 1;
             z = 2 * (r / (n - 1)) - 1;
-            y = 1 - x*x - z*z;
+            y = 1 - x * x - z * z;
             //console.log("x=" + x + " y=" + y + " z=" + z);
-            verarray.push(x,y,z);
+            verarray.push(x, y, z);
             //console.log(verarray); 
             //console.log("array[" + i + "] = " + verarray[i]);
-           //console.log("array" + verarray);
+            //console.log("array" + verarray);
         }
     }
-
-    var j = 0;
-    
+    //Adding indeces [i1,i2,i3] at row r, column c
     for (r = 0; r <= n - 1; r++) {
         for (c = 0; c <= n - 1; c++) {
+            
             i = r * n + c;
+
+            triarray.push(i);
+            //console.log(i);
+            triarray.push(i+3);
+            //triarray.push(i,i+1,i+2);
+
+            //console.log(triarray);
+            //i+=3;
         }
     }
 
     var vertices = new Float32Array(
         verarray
     );
-     //The number of vertices
+    
+    //The number of vertices
 
     var triangles = new Uint16Array(
-        triarray
+       triarray
     );
+    
 
     //Create buffer object
     var vertexBuffer = gl.createBuffer();
     var triangleBuffer = gl.createBuffer();
+
     if (!vertexBuffer) {
         console.log('Failed to create the buffer object');
         return -1;
@@ -111,12 +123,15 @@ function initVertexBuffers(gl) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangles, gl.STATIC_DRAW);
 
     var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+    //var v_Color = gl.getAttribLocation(gl.program, 'v_Color');
 
     //Assign the buffer object to a_Position variable
-    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
+    //gl.vertexAttribPointer(v_Color, 2, gl.FLOAT, false, 0, 0);
 
     //Enable the assignment to a_Position variable
     gl.enableVertexAttribArray(a_Position);
+    //gl.enableVertexAttribArray(v_Color);
 
     return n;
 }
