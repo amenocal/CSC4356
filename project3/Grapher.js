@@ -57,44 +57,26 @@ function initVertexBuffers(gl) {
     var verarray = new Array();
     var triarray = new Array();
 
-    var n = 4;
+    var n = 16;
     k=0;
     for (r = 0; r <= n; r++) {
         for (c = 0; c <= n; c++) {
             x = 2 * (c / (n - 1)) - 1;
             z = 2 * (r / (n - 1)) - 1;
             y = 1 - x*x - z*z;
-            console.log("x=" + x + " y=" + y + " z=" + z);
-
-            verarray[k] = x;
-            //console.log(k)
-            k++;
-            verarray[k] = z;
-            console.log(k)
-            k++;
-            verarray[k] = y;
-            console.log(k);
-            //console.log("array[" + k + "] = " + verarray[k]);
-            k++;
-
+            //console.log("x=" + x + " y=" + y + " z=" + z);
+            verarray.push(x,y,z);
+            //console.log(verarray); 
             //console.log("array[" + i + "] = " + verarray[i]);
            //console.log("array" + verarray);
         }
     }
 
     var j = 0;
-    for (j = 0; j <= verarray.length; j++){
-        console.log(verarray[j]);
-    }
+    
     for (r = 0; r <= n - 1; r++) {
         for (c = 0; c <= n - 1; c++) {
             i = r * n + c;
-            //console.log(i + "=" + r + "*" + n + "+" + c);
-            //triarray[0] = 0;
-            triarray[j] = i;
-            //console.log("triarray[" + j + "] = " + triarray[j]);
-            j+=3;
-
         }
     }
 
