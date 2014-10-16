@@ -62,7 +62,7 @@ function main() {
 
 function initVertexBuffers(gl) {
 
-    var i0, i2, i3, i4, i5, i6, r, c, x, y, z;
+    var i0, i1, i2, i3, i4, i5, r, c, x, y, z;
     var verarray = new Array();
     var triarray = new Array();
 
@@ -73,7 +73,7 @@ function initVertexBuffers(gl) {
         for (c = 0; c < n; c++) {
             x = 2 * (c / (n - 1)) - 1;
             z = 2 * (r / (n - 1)) - 1;
-            y = 1 - x * x - z * z;
+            y = 1 - Math.pow(x,2) - Math.pow(z,2);
 
             verarray.push(x, y, z);
         }
