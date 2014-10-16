@@ -79,7 +79,6 @@ function initVertexBuffers(gl) {
         }
     }
     //Adding indeces [i0,i1,i2] and [i3,i4,i5] at row r, column c
-
     for (r = 0; r < n - 1; r++) {
         for (c = 0; c < n - 1; c++) {
             i0 = (r + 0) * n + (c + 0);
