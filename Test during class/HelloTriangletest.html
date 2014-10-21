@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Interactive triforce</title>
+    <style type="text/css">
+    canvas {
+        background-image: url('http://csc.lsu.edu/~kooima/images/grid.svg');
+    }
+    </style>
+</head>
+
+<body onload="main()">
+    <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+    </canvas>
+
+    <table>
+        <tr>
+            <td>Opacity:</td>
+            <td>
+                <input id="background" type="checkbox" onchange="draw()">
+            </td>
+        </tr>
+        <tr>
+            <td>Red:</td>
+            <td>
+                <input id="rinput" type="range" min="0.0" max="1.0" step="0.01" oninput="draw()">
+            </td>
+            <td id="routput">0.5</td>
+        </tr>
+        <tr>
+            <td>Green:</td>
+            <td>
+                <input id="ginput" type="range" min="0.0" max="1.0" step="0.01" oninput="draw()">
+            </td>
+            <td id="goutput">0.5</td>
+        </tr>
+        <tr>
+            <td>Blue:</td>
+            <td>
+                <input id="binput" type="range" min="0.0" max="1.0" step="0.01" oninput="draw()">
+            </td>
+            <td id="boutput">0.5</td>
+        </tr>
+        <tr>
+            <td>Rotate:</td>
+            <td>
+                <input id="zinput" type="range" min="-180.0" max="180.0" step="1.0" oninput="draw()">
+            </td>
+            <td id="zoutput">0</td>
+        </tr>
+    </table>
+    <script src="webgl-utils.js"></script>
+    <script src="webgl-debug.js"></script>
+    <script src="cuon-utils.js"></script>
+    <script src="cuon-matrix.js"></script>
+    <script src="HelloTriangletest.js"></script>
+</body>
+
+</html>
