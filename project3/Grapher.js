@@ -73,7 +73,7 @@ function initVertexBuffers(gl) {
         for (c = 0; c < n; c++) {
             x = 2 * (c / (n - 1)) - 1;
             z = 2 * (r / (n - 1)) - 1;
-            y = 1 - Math.pow(x,2) - Math.pow(z,2);
+            y = 1 - Math.pow(x, 2) - Math.pow(z, 2);
 
             verarray.push(x, y, z);
         }
