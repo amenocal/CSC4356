@@ -102,15 +102,17 @@ function draw() {
 
     var y = parseFloat(document.getElementById("yinput").value);
     var z = parseFloat(document.getElementById("zinput").value);
+    var f = parseFloat(document.getElementById("finput").value);
 
     document.getElementById("youtput").innerHTML = y;
     document.getElementById("zoutput").innerHTML = z;
+    document.getElementById("foutput").innerHTML = f;
 
     // Compute the transform.
 
     var ProjectionLocation = gl.getUniformLocation(gl.program, 'Projection');
     var Projection = new Matrix4();
-    Projection.setPerspective(45, 1, 1, 10);
+    Projection.setPerspective(f, 1, 1, 10);
     gl.uniformMatrix4fv(ProjectionLocation, false, Projection.elements);
 
     var ModelLocation = gl.getUniformLocation(gl.program, 'Model');
