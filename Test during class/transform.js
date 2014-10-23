@@ -55,6 +55,9 @@ var vertexBuffer;
 var pointBuffer;
 var lineBuffer;
 
+var rotateY;
+var rotateX;
+
 function init() {
     // Initialize the WebGL context.
 
@@ -93,7 +96,31 @@ function init() {
     gl.clearColor(1.0, 1.0, 0.8, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
+    rotateY = 0.0;
+    rotateX = 0.0;
+
     draw();
+}
+
+
+function move(event) {
+    if (event.which == 1) {
+        rotateX = rotateX + event.movementY;
+        rotateY = rotateY + event.movementX;
+
+        if (rotateX > 90.0) {
+            rotateX = 90.0;
+        }
+        if (rotateX < -90.0) {
+            rotateX = -90.0;
+        }
+        if (rotateY > 180.0) {
+            rotateY -= 360.0;
+        }
+        if (rotateY < -180.0) {
+            rotateY += -360.0;
+        }
+    }
 }
 
 function draw() {
@@ -118,7 +145,9 @@ function draw() {
     var ModelLocation = gl.getUniformLocation(gl.program, 'Model');
     var Model = new Matrix4();
     Model.setTranslate(0, 0, -z);
-    Model.rotate(y, 0, 1, 0);
+    Model.rotate(rotateX, 1, 0, 0);
+    Model.rotate(rotateY, 0, 1, 0);
+
 
     gl.uniformMatrix4fv(ModelLocation, false, Model.elements);
 
@@ -135,6 +164,8 @@ function draw() {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
     gl.drawElements(gl.LINES, lines.length, gl.UNSIGNED_SHORT, 0);
+
+    requestAnimationFrame(draw);
 }
 
 
