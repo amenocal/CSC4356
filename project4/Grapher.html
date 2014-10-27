@@ -6,14 +6,32 @@
     <title>Function Grapher and Rendering</title>
 </head>
 
-<body onload="main()">
+<body onload="init()">
     <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
     </canvas>
 
+    <table>
+        <tr>
+            <td>Translate down Z:</td>
+            <td>
+                <input id="zinput" type="range" min="0.0" max="15.0" step="0.1" oninput="draw()">
+            </td>
+            <td id="zoutput">0</td>
+        </tr>
+        <tr>
+            <td>Field of View:</td>
+            <td>
+                <input id="finput" type="range" min="10.0" max="90.0" step="1" oninput="draw()">
+            </td>
+            <td id="foutput">0</td>
+        </tr>
+    </table>
+
     <script src="webgl-utils.js"></script>
     <script src="webgl-debug.js"></script>
     <script src="cuon-utils.js"></script>
+    <script src="cuon-matrix.js"></script>
     <script src="Grapher.js"></script>
 </body>
 

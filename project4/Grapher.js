@@ -20,7 +20,7 @@ var vertices;
 var gl;
 var n;
 
-function main() {
+function init() {
 
     var canvas = document.getElementById('webgl');
 
@@ -38,12 +38,43 @@ function main() {
         return;
     }
 
+    createArrays();
+
     //Set the positions of vertices
-    n = initVertexBuffers(gl);
-    if (n < 0) {
-        console.log('Failed to set the positions of the vertices');
-        return;
+    // n = initVertexBuffers(gl);
+    // if (n < 0) {
+    //     console.log('Failed to set the positions of the vertices');
+    //     return;
+    // }
+
+    var vertexBuffer = gl.createBuffer();
+    var triangleBuffer = gl.createBuffer();
+
+    if (!vertexBuffer) {
+        console.log('Failed to create the buffer object');
+        return -1;
     }
+
+    if (!triangleBuffer) {
+        console.log('Failed to create the buffer triangle object');
+        return -1;
+    }
+
+    // Bind the buffer object to target
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    //Write date into the buffer object
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangles, gl.STATIC_DRAW, 0);
+
+    var a_PositionLocation = gl.getAttribLocation(gl.program, 'a_Position');
+
+    //Assign the buffer object to a_Position variable
+    gl.vertexAttribPointer(a_PositionLocation, 3, gl.FLOAT, false, 0, 0);
+
+    //Enable the assignment to a_PositionLocation variable
+    gl.enableVertexAttribArray(a_PositionLocation);
 
     //Set the color for clearing <canvas>
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -53,14 +84,13 @@ function main() {
 
     gl.enable(gl.DEPTH_TEST);
 
-    //Draw a triangle
-    gl.drawArrays(gl.triangles, 0, n);
-
     gl.drawElements(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT, 0);
+
+    draw();
 
 }
 
-function initVertexBuffers(gl) {
+function createArrays() {
 
     var i0, i1, i2, i3, i4, i5, r, c, x, y, z;
     var verarray = new Array();
@@ -101,35 +131,9 @@ function initVertexBuffers(gl) {
         triarray
     );
 
-    //Create buffer object
-    var vertexBuffer = gl.createBuffer();
-    var triangleBuffer = gl.createBuffer();
+}
 
-    if (!vertexBuffer) {
-        console.log('Failed to create the buffer object');
-        return -1;
-    }
+function draw() {
 
-    if (!triangleBuffer) {
-        console.log('Failed to create the buffer triangle object');
-        return -1;
-    }
-
-    // Bind the buffer object to target
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    //Write date into the buffer object
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangles, gl.STATIC_DRAW, 0);
-
-    var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-
-    //Assign the buffer object to a_Position variable
-    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
-
-    //Enable the assignment to a_Position variable
-    gl.enableVertexAttribArray(a_Position);
-
-    return n;
+    gl.drawElements(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT, 0);
 }
