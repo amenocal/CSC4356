@@ -103,7 +103,7 @@ function init() {
 
 }
 
-function move(event) {
+function move(event){
     if (event.which == 1) {
         rotateX = rotateX + event.movementY;
         rotateY = rotateY + event.movementX;
@@ -111,12 +111,15 @@ function move(event) {
         if (rotateX > 90.0) {
             rotateX = 90.0;
         }
-        if (rotateX < -90.0) {
+
+        if (rotateX < 90.0) {
             rotateX = -90.0;
         }
+
         if (rotateY > 180.0) {
             rotateY -= 360.0;
         }
+
         if (rotateY < -180.0) {
             rotateY += -360.0;
         }
