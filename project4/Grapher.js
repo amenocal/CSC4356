@@ -13,9 +13,9 @@ var VSHADER_SOURCE =
 //Fragment shader program
 var FSHADER_SOURCE =
     'varying mediump vec4 v_Color;\n' +
-    'uniform mediump vec3 Light;\n' +
+    'uniform mediump vec4 Light;\n' +
     'void main() {\n' +
-    '  gl_FragColor = v_Color;\n' +
+    '  gl_FragColor = Light * v_Color;\n' +
     '}\n';
 
 var canvas;
@@ -52,13 +52,6 @@ function init() {
 
     createArrays();
 
-    //Set the positions of vertices
-    // n = initVertexBuffers(gl);
-    // if (n < 0) {
-    //     console.log('Failed to set the positions of the vertices');
-    //     return;
-    // }
-
     vertexBuffer = gl.createBuffer();
     triangleBuffer = gl.createBuffer();
     lineBuffer = gl.createBuffer();
@@ -78,9 +71,8 @@ function init() {
         return -1;
     }
 
-    // Bind the buffer object to target
+    //Bind the buffer vertices
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    //Write date into the buffer object
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
@@ -88,8 +80,6 @@ function init() {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangles, gl.STATIC_DRAW, 0);
-
-    
 
     var a_PositionLocation = gl.getAttribLocation(gl.program, 'a_Position');
 
@@ -133,7 +123,7 @@ function move(event) {
 
 function createArrays() {
 
-    var i0, i1, i2, i3, i4, i5, r, c, x, y, z;
+    var i0, i1, i2, i3, r, c, x, y, z;
     var verarray = new Array();
     var triarray = new Array();
     var linarray = new Array();
@@ -150,30 +140,28 @@ function createArrays() {
             verarray.push(x, y, z);
         }
     }
-    //Adding indeces [i0,i1,i2] and [i3,i4,i5] at row r, column c
+    //Adding indeces [i0,i1,i2] and [i2,i1,i3] at row r, column c
     for (r = 0; r < n - 1; r++) {
         for (c = 0; c < n - 1; c++) {
             i0 = (r + 0) * n + (c + 0);
             i1 = (r + 1) * n + (c + 0);
             i2 = (r + 0) * n + (c + 1);
             i3 = (r + 1) * n + (c + 1);
-            // i4 = (r + 1) * n + (c + 0);
-            // i5 = (r + 1) * n + (c + 1);
 
             triarray.push(i0, i1, i2);
             triarray.push(i2, i1, i3);
         }
     }
-
+    //Adding row-wise grid lines
     for (r = 0; r < n; r++) {
-        for (c = 0 ; c < n; c++) {
+        for (c = 0; c < n - 1; c++) {
             i0 = (r + 0) * n + (c + 0);
             i2 = (r + 0) * n + (c + 1);
 
             linarray.push(i0, i2);
         }
     }
-
+    //Adding column-wise grid lines
     for (r = 0; r < n - 1; r++) {
         for (c = 0; c < n; c++) {
             i0 = (r + 0) * n + (c + 0);
@@ -203,15 +191,12 @@ function draw() {
     var f = parseFloat(document.getElementById("finput").value);
 
     document.getElementById("zoutput").innerHTML = z;
-    document.getElementById("foutput").innerHTML = f
-
-    //Computing the transform
+    document.getElementById("foutput").innerHTML = f;
 
     var ProjectLocation = gl.getUniformLocation(gl.program, 'Projection');
     var Projection = new Matrix4();
     Projection.setPerspective(f, 1, 1, 10);
     gl.uniformMatrix4fv(ProjectLocation, false, Projection.elements);
-
 
     var ModelLocation = gl.getUniformLocation(gl.program, 'Model');
     var Model = new Matrix4();
@@ -222,16 +207,15 @@ function draw() {
 
     var LightLocation = gl.getUniformLocation(gl.program, 'Light');
 
-
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    //gl.uniform3f(LightLocation, 1, 1, 1);
+    gl.uniform4f(LightLocation, 1, 1, 1, 1);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
     gl.drawElements(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT, 0);
 
-    //gl.uniform3f(LightLocation, 0, 0, 0);
+    gl.uniform4f(LightLocation, 0, 0, 0, 1);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
     gl.drawElements(gl.LINES, lines.length, gl.UNSIGNED_SHORT, 0);
-
-    
 
     requestAnimationFrame(draw);
 }
