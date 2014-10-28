@@ -13,6 +13,7 @@ var VSHADER_SOURCE =
 //Fragment shader program
 var FSHADER_SOURCE =
     'varying mediump vec4 v_Color;\n' +
+    'uniform mediump vec3 Light;\n' +
     'void main() {\n' +
     '  gl_FragColor = v_Color;\n' +
     '}\n';
@@ -60,6 +61,7 @@ function init() {
 
     vertexBuffer = gl.createBuffer();
     triangleBuffer = gl.createBuffer();
+    lineBuffer = gl.createBuffer();
 
     if (!vertexBuffer) {
         console.log('Failed to create the buffer object');
@@ -71,13 +73,23 @@ function init() {
         return -1;
     }
 
+    if (!lineBuffer) {
+        console.log('Failed to create the line buffer object');
+        return -1;
+    }
+
     // Bind the buffer object to target
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     //Write date into the buffer object
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, lines, gl.STATIC_DRAW, 0);
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangles, gl.STATIC_DRAW, 0);
+
+    
 
     var a_PositionLocation = gl.getAttribLocation(gl.program, 'a_Position');
 
@@ -90,11 +102,7 @@ function init() {
     //Set the color for clearing <canvas>
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    //Clear <canvas>
-
     gl.enable(gl.DEPTH_TEST);
-
-    gl.drawElements(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT, 0);
 
     rotateX = 0.0;
     rotateY = 0.0;
@@ -128,6 +136,7 @@ function createArrays() {
     var i0, i1, i2, i3, i4, i5, r, c, x, y, z;
     var verarray = new Array();
     var triarray = new Array();
+    var linarray = new Array();
 
     n = 16;
 
@@ -147,12 +156,30 @@ function createArrays() {
             i0 = (r + 0) * n + (c + 0);
             i1 = (r + 1) * n + (c + 0);
             i2 = (r + 0) * n + (c + 1);
-            i3 = (r + 0) * n + (c + 1);
-            i4 = (r + 1) * n + (c + 0);
-            i5 = (r + 1) * n + (c + 1);
+            i3 = (r + 1) * n + (c + 1);
+            // i4 = (r + 1) * n + (c + 0);
+            // i5 = (r + 1) * n + (c + 1);
 
             triarray.push(i0, i1, i2);
-            triarray.push(i3, i4, i5);
+            triarray.push(i2, i1, i3);
+        }
+    }
+
+    for (r = 0; r < n; r++) {
+        for (c = 0 ; c < n; c++) {
+            i0 = (r + 0) * n + (c + 0);
+            i2 = (r + 0) * n + (c + 1);
+
+            linarray.push(i0, i2);
+        }
+    }
+
+    for (r = 0; r < n - 1; r++) {
+        for (c = 0; c < n; c++) {
+            i0 = (r + 0) * n + (c + 0);
+            i1 = (r + 1) * n + (c + 0);
+
+            linarray.push(i0, i1);
         }
     }
 
@@ -162,6 +189,10 @@ function createArrays() {
 
     triangles = new Uint16Array(
         triarray
+    );
+
+    lines = new Uint16Array(
+        linarray
     );
 
 }
@@ -189,10 +220,18 @@ function draw() {
     Model.rotate(rotateY, 0, 1, 0);
     gl.uniformMatrix4fv(ModelLocation, false, Model.elements);
 
+    var LightLocation = gl.getUniformLocation(gl.program, 'Light');
+
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
+    //gl.uniform3f(LightLocation, 1, 1, 1);
     gl.drawElements(gl.TRIANGLES, triangles.length, gl.UNSIGNED_SHORT, 0);
+
+    //gl.uniform3f(LightLocation, 0, 0, 0);
+    gl.drawElements(gl.LINES, lines.length, gl.UNSIGNED_SHORT, 0);
+
+    
 
     requestAnimationFrame(draw);
 }
