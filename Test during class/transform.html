@@ -11,30 +11,16 @@
 </head>
 
 <body onload="init()">
-    <canvas id="webgl" width="500px" height="500px" onmousemove="move(event)">
+    <canvas id="webgl" width="500px" height="500px">
         This content requires <a href="http://get.webgl.org/">WebGL</a>.
     </canvas>
     <table>
         <tr>
-            <td>Rotate about Y:</td>
-            <td>
-                <input id="yinput" type="range" min="-180.0" max="180.0" step="1" oninput="draw()">
-            </td>
-            <td id="youtput">0</td>
-        </tr>
-        <tr>
             <td>Translate down Z:</td>
             <td>
-                <input id="zinput" type="range" min="0.0" max="15.0" step="0.1" oninput="draw()">
+                <input id="zinput" type="range" min="0.0" max="15.0" step="0.1" oninput="slide()">
             </td>
             <td id="zoutput">0</td>
-        </tr>
-        <tr>
-            <td>Field of View:</td>
-            <td>
-                <input id="finput" type="range" min="10.0" max="90.0" step="1" oninput="draw()">
-            </td>
-            <td id="foutput">0</td>
         </tr>
     </table>
 </body>

@@ -57,6 +57,7 @@ var lineBuffer;
 
 var rotateY;
 var rotateX;
+var translateZ;
 
 function init() {
     // Initialize the WebGL context.
@@ -98,53 +99,69 @@ function init() {
 
     rotateY = 0.0;
     rotateX = 0.0;
+    translateZ = 5.0;
 
-    draw();
+    requestAnimationFrame(draw);
+
+    var dragging = false;
+    var lastX = 0;
+    var lastY = 0;
+
+    canvas.onmousedown = function(event) {
+        dragging = true;
+    }
+
+    canvas.onmouseup = function(event) {
+        dragging = false;
+    }
+
+    canvas.onmousemove = function(event) {
+        if (dragging) {
+            rotateY = rotateY + event.clientX - lastX;
+            rotateX = rotateX + event.clientY - lastY;
+
+            if (rotateX > 90.0) {
+                rotateX = 90.0;
+            }
+            if (rotateX < -90.0) {
+                rotateX = -90.0;
+            }
+            if (rotateY > 180.0) {
+                rotateY -= 360.0;
+            }
+            if (rotateY < -180.0) {
+                rotateY += -360.0;
+            }
+            requestAnimationFrame(draw);
+        }
+        lastX = event.clientX;
+        lastY = event.clientY;
+    }
+
 }
 
+function slide() {
+    // Handle the GUI.  
 
-function move(event) {
-    if (event.which == 1) {
-        rotateX = rotateX + event.movementY;
-        rotateY = rotateY + event.movementX;
+    translateZ = parseFloat(document.getElementById("zinput").value);
 
-        if (rotateX > 90.0) {
-            rotateX = 90.0;
-        }
-        if (rotateX < -90.0) {
-            rotateX = -90.0;
-        }
-        if (rotateY > 180.0) {
-            rotateY -= 360.0;
-        }
-        if (rotateY < -180.0) {
-            rotateY += -360.0;
-        }
-    }
+    document.getElementById("zoutput").innerHTML = translateZ;
+
+    requestAnimationFrame(draw);
 }
 
 function draw() {
-
-    // Handle the GUI.
-
-    var y = parseFloat(document.getElementById("yinput").value);
-    var z = parseFloat(document.getElementById("zinput").value);
-    var f = parseFloat(document.getElementById("finput").value);
-
-    document.getElementById("youtput").innerHTML = y;
-    document.getElementById("zoutput").innerHTML = z;
-    document.getElementById("foutput").innerHTML = f;
 
     // Compute the transform.
 
     var ProjectionLocation = gl.getUniformLocation(gl.program, 'Projection');
     var Projection = new Matrix4();
-    Projection.setPerspective(f, 1, 1, 10);
+    Projection.setPerspective(45, 1, 1, 10);
     gl.uniformMatrix4fv(ProjectionLocation, false, Projection.elements);
 
     var ModelLocation = gl.getUniformLocation(gl.program, 'Model');
     var Model = new Matrix4();
-    Model.setTranslate(0, 0, -z);
+    Model.setTranslate(0, 0, -translateZ);
     Model.rotate(rotateX, 1, 0, 0);
     Model.rotate(rotateY, 0, 1, 0);
 
@@ -164,9 +181,6 @@ function draw() {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
     gl.drawElements(gl.LINES, lines.length, gl.UNSIGNED_SHORT, 0);
-
-    requestAnimationFrame(draw);
 }
-
 
 //------------------------------------------------------------------------------
