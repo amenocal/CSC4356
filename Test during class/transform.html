@@ -11,6 +11,22 @@
 </head>
 
 <body onload="init()">
+    <script id="vertexShader" type="x-shader/x-vertex">
+        attribute vec4 vPosition; 
+        uniform mat4 Projection; 
+        uniform mat4 Model; 
+        void main() { 
+            gl_Position = Projection * Model * vPosition;
+            gl_PointSize = 8.0; 
+       }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        varying mediump vec3 fColor; 
+        void main() { 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); 
+        }
+    </script>
     <canvas id="webgl" width="500px" height="500px">
         This content requires <a href="http://get.webgl.org/">WebGL</a>.
     </canvas>
@@ -23,6 +39,7 @@
             <td id="zoutput">0</td>
         </tr>
     </table>
+    <input type="button" value="Screenshot" onclick="snap()">
 </body>
 
 </html>

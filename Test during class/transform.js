@@ -31,20 +31,20 @@ var lines = new Uint16Array([
 
 //------------------------------------------------------------------------------
 
-var vertex_shader_source =
-    'attribute vec4 vPosition;\n' +
-    'uniform mat4 Projection;\n' +
-    'uniform   mat4 Model;\n' +
-    'void main() {\n' +
-    '    gl_Position  = Projection * Model * vPosition;\n' +
-    '    gl_PointSize = 8.0;\n' +
-    '}\n';
+// var vertex_shader_source =
+// 'attribute vec4 vPosition;\n' +
+// 'uniform mat4 Projection;\n' +
+// 'uniform   mat4 Model;\n' +
+// 'void main() {\n' +
+// '    gl_Position  = Projection * Model * vPosition;\n' +
+// '    gl_PointSize = 8.0;\n' +
+// '}\n';
 
-var fragment_shader_source =
-    'varying mediump vec3 fColor;\n' +
-    'void main() {\n' +
-    '    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n' +
-    '}\n';
+// var fragment_shader_source =
+// 'varying mediump vec3 fColor;\n' +
+// 'void main() {\n' +
+// '    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n' +
+// '}\n';
 
 //------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ function init() {
 
     // Initialize the program object and its uniforms.
 
-    initShaders(gl, vertex_shader_source, fragment_shader_source);
+    initShaders(gl, document.getElementById('vertexShader').text, document.getElementById('fragmentShader').text);
 
     // Initialize vertex and index buffer objects.
 
@@ -181,6 +181,13 @@ function draw() {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
     gl.drawElements(gl.LINES, lines.length, gl.UNSIGNED_SHORT, 0);
+}
+
+function snap() {
+    draw();
+    var img = new Image();
+    img.src = canvas.toDataURL();
+    document.body.appendChild(img);
 }
 
 //------------------------------------------------------------------------------
