@@ -17,8 +17,39 @@
 <body onload="init()">
     <script id="vertexShader" type="x-shader/x-vertex">
         /*Vertex Shader*/
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform vec3 lightDirection;
+        uniform vec3 lightColor;
+        uniform vec3 objectColor;
+
+        attribute vec4 vertexPosition;
+        attribute vec3 vertexNormal;
+
+        varying mediump vec3 fragmentColor;
+
+        function main(){
+        	p = dot(modelMatrix, vertexPosition);
+        	n = normalize(dot(mat3(modelMatrix), vertexNormal));
+        	l = normalize(dot(mat3(modelMatrix), lightDirection));
+
+        	v = normalize(vec3(-p));
+        	h = normalize(addition(v,l));
+
+        	d = max(dot(n,l),0);
+        	s = pow(max(dot(n,h),0),100);
+
+        	fragmentColor = dot(lightColor, dot(objectColor, addition(d,s)));
+        	gl_position = dot(dot(modelMatrix, vertexPosition), projectionMatrix);
+        }
+        /*Vertex Shader*/
     </script>
     <script id="fragmentShader" type="x-shader/x-fragment">
+        /*Fragment Shader*/
+        varying mediump vec3 fragmentColor
+        function main() {
+        	gl_FragColor = vec4(fragmentColor, 1.0);
+        }
         /*Fragment Shader*/
     </script>
     <!--Elements-->
