@@ -40,7 +40,7 @@ function onmousemove(event) {
         if (modelRotationX > 90.0) {
             modelRotationX = 90.0;
         }
-        if (modelRotationY < -90.0) {
+        if (modelRotationX < -90.0) {
             modelRotationX = -90.0;
         }
 
@@ -175,6 +175,7 @@ function init() {
         requestAnimationFrame(draw);
     }
 /*Initialization*/
+
 /*Translation down Z*/
 function transZ() {
 
@@ -185,6 +186,7 @@ function transZ() {
     requestAnimationFrame(draw);
 }
 /*Translation down Z*/
+
 /*Rendering*/
 function draw() {
     projectionMatrix = new Matrix4();
