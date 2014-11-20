@@ -8,7 +8,7 @@
     <script type="text/javascript" src="webgl-debug.js"></script>
     <script type="text/javascript" src="cuon-utils.js"></script>
     <script type="text/javascript" src="cuon-matrix.js"></script>
-    <script type="text/javascript" src="bunny2.js"></script>
+    <script type="text/javascript" src="bunny.js"></script>
     <script type="text/javascript" src="Viewer.js"></script>
     <!--Headers-->
 </head>
@@ -32,37 +32,47 @@
         vec3 l;
         vec3 v;
         vec3 h;
-        vec3 d;
-        vec3 s;
+        float d;
+        float s;
 
-        function main(){
-        	p = dot(modelMatrix, vertexPosition);
-        	n = normalize(dot(mat3(modelMatrix), vertexNormal));
-        	l = normalize(dot(mat3(modelMatrix), lightDirection));
+        void main() {
+        	p = modelMatrix*vertexPosition;
+        	n = normalize(mat3(modelMatrix)*vertexNormal);
+        	l = normalize(mat3(modelMatrix)*lightDirection);
 
         	v = normalize(vec3(-p));
-        	h = normalize(addition(v,l));
+        	h = normalize(v+l);
 
-        	d = max(dot(n,l),0);
-        	s = pow(max(dot(n,h),0),100);
+        	d = max(dot(n,l),0.0);
+        	s = pow(max(dot(n,h),0.0),100.0);
 
-        	fragmentColor = dot(lightColor, dot(objectColor, addition(d,s)));
-        	gl_position = dot(dot(modelMatrix, vertexPosition), projectionMatrix);
+        	fragmentColor = lightColor * (objectColor * d + vec3(s));
+        	gl_Position = modelMatrix*vertexPosition*projectionMatrix;
         }
         /*Vertex Shader*/
     </script>
     <script id="fragmentShader" type="x-shader/x-fragment">
         /*Fragment Shader*/
-        varying mediump vec3 fragmentColor
-        function main() {
+        varying mediump vec3 fragmentColor;
+        void main() {
         	gl_FragColor = vec4(fragmentColor, 1.0);
         }
         /*Fragment Shader*/
     </script>
     <!--Elements-->
-    <canvas id="webgl" width="500px" height="500px">
+    <canvas id="webgl" width="500px" height="500px" >
         This content requires <a href="http://get.webgl.org/">WebGL</a>
     </canvas>
+    <table>
+        <tr>
+            <td>Translate down Z:</td>
+            <td>
+                <input id="zinput" type="range" min="0.0" max="15.0" step="0.1" oninput="transZ()">
+            </td>
+            <td id="zoutput">0</td>
+        </tr>
+
+</table>
 </body>
 
 </html>

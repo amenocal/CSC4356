@@ -1,15 +1,30 @@
 /*Interaction */
 var modelRotationX = 0;
 var modelRotationY = 0;
-var modelTranslationZ = 0;
+var modelTranslationZ = 3;
 var dragging = false;
 var lastClientX;
 var lastClientY;
 
+var projectionMatrixLocation;
+var modelMatrixLocation;
+var lightDirectionLocation;
+var lightColorLocation;
+var objectColorLocation;
+var vertexPositionLocation;
+var vertexNormalLocation;
+
+var positionArray;
+var normalArray;
+var triangleArray;
+
+var projectionMatrix;
+var modelMatrix;
+
 function onmousedown(event) {
     dragging = true;
-    lastClientX = event.ClientX;
-    lastClientY = event.ClientY;
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
 }
 
 function onmouseup(event) {
@@ -18,20 +33,22 @@ function onmouseup(event) {
 
 function onmousemove(event) {
     if (dragging) {
-        modelRotationY = modelRotationY + event.ClientX - lastClientX;
-        modelRotationX = modelRotationX + event.ClientY - lastClientY;
+        modelRotationY = modelRotationY + event.clientX - lastClientX;
+        modelRotationX = modelRotationX + event.clientY - lastClientY;
+
+
+        if (modelRotationX > 90.0) {
+            modelRotationX = 90.0;
+        }
+        if (modelRotationY < -90.0) {
+            modelRotationX = -90.0;
+        }
+
+        requestAnimationFrame(draw);
     }
 
-    if (modelRotationX > 90.0) {
-        modelRotationX = 90.0;
-    }
-    if (modelRotationY < -90.0) {
-        modelRotationX = -90.0;
-    }
-
-    requestAnimationFrame(draw);
-    lastClientX = event.ClientX;
-    lastClientY = event.ClientY;
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
 }
 
 /*Interaction*/
@@ -76,7 +93,7 @@ function normalize(a) {
             a[2] / len
         ];
     }
-    /*Vector Operators*/
+/*Vector Operators*/
 
 function flatten(a) {
     return a.reduce(function(b, v) {
@@ -87,6 +104,9 @@ function flatten(a) {
 
 function init() {
         canvas = document.getElementById('webgl');
+        canvas.onmousemove = onmousemove;
+        canvas.onmouseup = onmouseup;
+        canvas.onmousedown = onmousedown;
         gl = getWebGLContext(canvas, false);
 
         /*Normal Calculation*/
@@ -94,55 +114,49 @@ function init() {
         var n = [0, 0, 0]
         var i0, i1, i2;
 
-        //Check to see if the limit is vertices or vertices.length
         for (i = 0; i < vertices.length; i++) {
             normals.push(n);
         }
 
-        for (i = 0; i < triangles.length; i++){
-        	i0 = triangles[i][0];
-        	i1 = triangles[i][1];
-        	i2 = triangles[i][2];
-        }
-
         for (i = 0; i < triangles.length; i++) {
-            a = normalize(vertices[i1] - vertices[i0]);
-            b = normalize(vertices[i2] - vertices[i0]);
+            i0 = triangles[i][0];
+            i1 = triangles[i][1];
+            i2 = triangles[i][2];
+            a = normalize(subtract(vertices[i1], vertices[i0]));
+            b = normalize(subtract(vertices[i2], vertices[i0]));
 
             n = normalize(cross(a, b));
 
-            normals[i0] = normals[i0] + n;
-            normals[i1] = normals[i1] + n;
-            normals[i2] = normals[i2] + n;
+            normals[i0] = addition(normals[i0], n);
+            normals[i1] = addition(normals[i1], n);
+            normals[i2] = addition(normals[i2], n);
         }
 
         for (i = 0; i < normals.length; i++) {
-            n = normalize(n);
+            normals[i] = normalize(normals[i]);
         }
         /*Normal Calculation*/
 
-        var positionArray;
-        var normalArray;
-        var triangleArray;
         /*Shader Initialization*/
         initShaders(gl, document.getElementById("vertexShader").text, document.getElementById("fragmentShader").text);
-        var projectionMatrixLocation = gl.getUniformLocation(gl.program, "projectionMatrix");
-        var modelMatrixLocation = gl.getUniformLocation(gl.program, "modelMatrix");
-        var lightDirectionLocation = gl.getUniformLocation(gl.program, "lightDirection");
-        var lightColorLocation = gl.getUniformLocation(gl.program, "lightColor");
-        var objectColorLocation = gl.getUniformLocation(gl.program, "objectColor");
+
+        projectionMatrixLocation = gl.getUniformLocation(gl.program, "projectionMatrix");
+        modelMatrixLocation = gl.getUniformLocation(gl.program, "modelMatrix");
+        lightDirectionLocation = gl.getUniformLocation(gl.program, "lightDirection");
+        lightColorLocation = gl.getUniformLocation(gl.program, "lightColor");
+        objectColorLocation = gl.getUniformLocation(gl.program, "objectColor");
         /*Shader Initialization*/
 
         /*Buffer Initialization*/
-        var vertexPositionLocation = gl.getAttribLocation(gl.program, "vertexPosition");
-        var vertexNormalLocation = gl.getAttribLocation(gl.program, "vertexNormal");
+        vertexPositionLocation = gl.getAttribLocation(gl.program, "vertexPosition");
+        vertexNormalLocation = gl.getAttribLocation(gl.program, "vertexNormal");
 
         gl.enableVertexAttribArray(vertexPositionLocation);
         gl.enableVertexAttribArray(vertexNormalLocation);
 
         positionArray = new Float32Array(flatten(vertices));
         normalArray = new Float32Array(flatten(normals));
-        triangleArray = new UInt16Array(flatten(triangles));
+        triangleArray = new Uint16Array(flatten(triangles));
 
         positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -156,21 +170,33 @@ function init() {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangleArray, gl.STATIC_DRAW);
         /*Buffer Initialization*/
-        //gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-        //gl.enable(gl.DEPTH_TEST);
+        gl.clearColor(0.54, 0.28, 0.62, 1.0);
 
         requestAnimationFrame(draw);
     }
-    /*Initialization*/
+/*Initialization*/
+/*Translation down Z*/
+function transZ() {
 
+	modelTranslationZ = parseFloat(document.getElementById("zinput").value);
+
+    document.getElementById("zoutput").innerHTML = modelTranslationZ;
+
+    requestAnimationFrame(draw);
+}
+/*Translation down Z*/
 /*Rendering*/
 function draw() {
-    projectionMatrix = perspective(45, 1, 1, 10);
-    modelMatrix = dot(translation(0, 0, -modelTranslationZ), dot(rotation(modelRotationX, 1, 0, 0), rotation(modelRotationY, 0, 1, 0)));
+    projectionMatrix = new Matrix4();
+    modelMatrix = new Matrix4();
 
-    gl.uniformMatrix4(projectionMatrixLocation, false, projectionMatrix);
-    gl.uniformMatrix4(modelMatrixLocation, false, modelMatrix);
+    projectionMatrix.setPerspective(45, 1, 1, 10);
+    modelMatrix.setTranslate(0, 0, -modelTranslationZ);
+    modelMatrix.rotate(modelRotationX, 1, 0, 0);
+    modelMatrix.rotate(modelRotationY, 0, 1, 0);
+
+    gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix.elements);
+    gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix.elements);
 
     gl.uniform3f(lightDirectionLocation, 0.0, 1.0, 1.0);
     gl.uniform3f(lightColorLocation, 1.0, 1.0, 1.0);
@@ -190,5 +216,4 @@ function draw() {
 
     gl.drawElements(gl.TRIANGLES, triangleArray.length, gl.UNSIGNED_SHORT, 0);
 }
-
 /*Rendering*/
