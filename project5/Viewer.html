@@ -27,6 +27,14 @@
 
         varying mediump vec3 fragmentColor;
 
+        vec4 p;
+        vec3 n;
+        vec3 l;
+        vec3 v;
+        vec3 h;
+        vec3 d;
+        vec3 s;
+
         function main(){
         	p = dot(modelMatrix, vertexPosition);
         	n = normalize(dot(mat3(modelMatrix), vertexNormal));

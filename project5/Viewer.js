@@ -121,6 +121,9 @@ function init() {
         }
         /*Normal Calculation*/
 
+        var positionArray;
+        var normalArray;
+        var triangleArray;
         /*Shader Initialization*/
         initShaders(gl, document.getElementById("vertexShader").text, document.getElementById("fragmentShader").text);
         var projectionMatrixLocation = gl.getUniformLocation(gl.program, "projectionMatrix");
