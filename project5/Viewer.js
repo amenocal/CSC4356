@@ -82,31 +82,38 @@ function flatten(a) {
     return a.reduce(function(b, v) {
         b.push.apply(b, v);
         return b
-    },[])
+    }, [])
 }
 
 function init() {
         canvas = document.getElementById('webgl');
-        gl = getWebGlContext(canvas, false);
+        gl = getWebGLContext(canvas, false);
 
         /*Normal Calculation*/
         var normals = new Array();
         var n = [0, 0, 0]
+        var i0, i1, i2;
 
         //Check to see if the limit is vertices or vertices.length
         for (i = 0; i < vertices.length; i++) {
             normals.push(n);
         }
 
+        for (i = 0; i < triangles.length; i++){
+        	i0 = triangles[i][0];
+        	i1 = triangles[i][1];
+        	i2 = triangles[i][2];
+        }
+
         for (i = 0; i < triangles.length; i++) {
-            a = normalize(vertices[i + 1] - vertices[i]);
-            b = normalize(vertices[i + 2] - vertices[i]);
+            a = normalize(vertices[i1] - vertices[i0]);
+            b = normalize(vertices[i2] - vertices[i0]);
 
             n = normalize(cross(a, b));
 
-            normals[i] = normals[i] + n;
-            normals[i + 1] = normals[i + 1] + n;
-            normals[i + 2] = normals[i + 2] + n;
+            normals[i0] = normals[i0] + n;
+            normals[i1] = normals[i1] + n;
+            normals[i2] = normals[i2] + n;
         }
 
         for (i = 0; i < normals.length; i++) {
@@ -124,7 +131,7 @@ function init() {
         /*Shader Initialization*/
 
         /*Buffer Initialization*/
-        var PositionLocation = gl.getAttribLocation(gl.program, "vertexPosition");
+        var vertexPositionLocation = gl.getAttribLocation(gl.program, "vertexPosition");
         var vertexNormalLocation = gl.getAttribLocation(gl.program, "vertexNormal");
 
         gl.enableVertexAttribArray(vertexPositionLocation);
