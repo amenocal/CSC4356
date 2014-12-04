@@ -24,4 +24,8 @@ Use of transformation for viewing. We Modified the implementation of Prog 3 to i
 
 We displayed the inverted paraboloid and rendered a gird of black lines on top of the triangle mesh. This involved the introduction of a uniform variable to disable the appearance of color, it could be considered as Light.
 
-##Prog 5: Shaded Model Viewer 
+##Prog 5: Shaded Model Viewer
+
+Purpose of this project was to practice basic gemotry processing and shaded rendering. This program takes a table of vertices and triangles in JSON format, it calculates a smoothen normal for each vertex, render the resulting data using basic lightning, and allow the user to tumble the shaded model using the mouse.
+
+Bunny 3D image. 

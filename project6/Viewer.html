@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Shaded Model Viewer</title>
+    <!--Headers-->
+    <script type="text/javascript" src="webgl-utils.js"></script>
+    <script type="text/javascript" src="webgl-debug.js"></script>
+    <script type="text/javascript" src="cuon-utils.js"></script>
+    <script type="text/javascript" src="cuon-matrix.js"></script>
+    <script type="text/javascript" src="bunny.js"></script>
+    <script type="text/javascript" src="Viewer.js"></script>
+    <!--Headers-->
+</head>
+
+<body onload="init()">
+    <script id="vertexShader" type="x-shader/x-vertex">
+        /*Vertex Shader*/
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform vec4 lightPosition;
+        uniform vec3 lightColor;
+        uniform vec3 objectColor;
+
+        attribute vec4 vertexPosition;
+        attribute vec3 vertexNormal;
+
+        varying mediump vec3 fragmentColor;
+
+        vec4 p;
+        vec4 l;
+        vec3 n;
+        vec3 v;
+        vec3 h;
+        vec3 d;
+        float kd;
+        float s;
+
+        void main() {
+        	p =                modelMatrix * vertexPosition;
+        	l =                modelMatrix * lightPosition;
+            n = normalize(mat3(modelMatrix) * vertexNormal);
+
+            d = normalize(vec3(l - p));
+
+        	v = normalize(vec3(-p));
+        	h = normalize(v+d);
+
+        	kd = max(dot(n,d),0.0);
+        	s = pow(max(dot(n,h),0.0),100.0);
+
+        	fragmentColor = lightColor * (objectColor * kd + vec3(s));
+        	gl_Position = modelMatrix*vertexPosition*projectionMatrix;
+        }
+        /*Vertex Shader*/
+    </script>
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        /*Fragment Shader*/
+        varying mediump vec3 fragmentColor;
+        void main() {
+        	gl_FragColor = vec4(fragmentColor, 1.0);
+        }
+        /*Fragment Shader*/
+    </script>
+    <!--Elements-->
+    <canvas id="webgl" width="500px" height="500px" >
+        This content requires <a href="http://get.webgl.org/">WebGL</a>
+    </canvas>
+    <table>
+        <tr>
+            <td>Translate down Z:</td>
+            <td>
+                <input id="modelTranslationZInput" type="range" value="3.0" min="0.0" max="10.0" step="0.1" oninput="slider()">
+            </td>
+            <td id="modelTranslationZOutput">3</td>
+        </tr>
+        <tr>
+            <td>Light X:</td>
+            <td>
+                <input id="lightPositionXInput" type="range" value="0.0" min="-5.0" max="5.0" step="0.1" oninput="slider()">
+            </td>
+            <td id="lightPositionXOutput">0</td>
+        </tr>
+        <tr>
+            <td>Light Y:</td>
+            <td>
+                <input id="lightPositionYInput" type="range" value="1.0" min="-5.0" max="5.0" step="0.1" oninput="slider()">
+            </td>
+            <td id="lightPositionYOutput">1</td>
+        </tr>
+        <tr>
+            <td>Light Z:</td>
+            <td>
+                <input id="lightPositionZInput" type="range" value="0.0" min="-5.0" max="5.0" step="0.1" oninput="slider()">
+            </td>
+            <td id="lightPositionZOutput">0</td>
+        </tr>
+    </table>
+    <!--Elements-->
+</body>
+</html>
