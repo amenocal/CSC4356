@@ -10,7 +10,7 @@ var projectionMatrixLocation;
 var modelMatrixLocation;
 var lightPositionLocation;
 var lightColorLocation;
-var objectColorLocation;
+var modelColorLocation;
 var vertexPositionLocation;
 var vertexNormalLocation;
 
@@ -24,6 +24,8 @@ var modelMatrix;
 var lightPositionX = 0;
 var lightPositionY = 1;
 var lightPositionZ = 0;
+
+var modelTexture;
 
 function onmousedown(event) {
     dragging = true;
@@ -97,7 +99,7 @@ function normalize(a) {
             a[2] / len
         ];
     }
-/*Vector Operators*/
+    /*Vector Operators*/
 
 function flatten(a) {
     return a.reduce(function(b, v) {
@@ -113,34 +115,6 @@ function init() {
         canvas.onmousedown = onmousedown;
         gl = getWebGLContext(canvas, false);
 
-        /*Normal Calculation*/
-        var normals = new Array();
-        var n = [0, 0, 0]
-        var i0, i1, i2;
-
-        for (i = 0; i < vertices.length; i++) {
-            normals.push(n);
-        }
-
-        for (i = 0; i < triangles.length; i++) {
-            i0 = triangles[i][0];
-            i1 = triangles[i][1];
-            i2 = triangles[i][2];
-            a = normalize(subtract(vertices[i1], vertices[i0]));
-            b = normalize(subtract(vertices[i2], vertices[i0]));
-
-            n = normalize(cross(a, b));
-
-            normals[i0] = addition(normals[i0], n);
-            normals[i1] = addition(normals[i1], n);
-            normals[i2] = addition(normals[i2], n);
-        }
-
-        for (i = 0; i < normals.length; i++) {
-            normals[i] = normalize(normals[i]);
-        }
-        /*Normal Calculation*/
-
         /*Shader Initialization*/
         initShaders(gl, document.getElementById("vertexShader").text, document.getElementById("fragmentShader").text);
 
@@ -148,19 +122,22 @@ function init() {
         modelMatrixLocation = gl.getUniformLocation(gl.program, "modelMatrix");
         lightPositionLocation = gl.getUniformLocation(gl.program, "lightPosition");
         lightColorLocation = gl.getUniformLocation(gl.program, "lightColor");
-        objectColorLocation = gl.getUniformLocation(gl.program, "objectColor");
+        //objectColorLocation = gl.getUniformLocation(gl.program, "objectColor"); /*check if needed*/
         /*Shader Initialization*/
 
         /*Buffer Initialization*/
         vertexPositionLocation = gl.getAttribLocation(gl.program, "vertexPosition");
         vertexNormalLocation = gl.getAttribLocation(gl.program, "vertexNormal");
+        vertexTexCoordLocation = gl.getAttribLocation(gl.program, "vertexTexCoord");
 
         gl.enableVertexAttribArray(vertexPositionLocation);
         gl.enableVertexAttribArray(vertexNormalLocation);
+        gl.enableVertexAttribArray(vertexTexCoordLocation);
 
         positionArray = new Float32Array(flatten(vertices));
         normalArray = new Float32Array(flatten(normals));
         triangleArray = new Uint16Array(flatten(triangles));
+        texCoordArray = new Float32Array(flatten(texCoords));
 
         positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -173,45 +150,75 @@ function init() {
         triangleBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangleArray, gl.STATIC_DRAW);
+
+        texCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, texCoordArray, gl.STATIC_DRAW);
         /*Buffer Initialization*/
         gl.clearColor(0.54, 0.28, 0.62, 1.0);
 
+        /*Texture Initialization*/
+        function loadTexture(image, texture) {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+            requestAnimationFrame(draw);
+        }
+
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        modelTexture = gl.createTexture();
+
+        modelImage = new Image();
+        modelImage.onload = function() {
+            loadTexture(modelImage, modelTexture);
+        }
+        modelImage.crossOrigin = "anonymous";
+        modelImage.src = "http://i.imgur.com/7thU1gD.jpg";
+        /*Texture Initialization*/
+
         requestAnimationFrame(draw);
     }
-/*Initialization*/
+    /*Initialization*/
 
 /*Rendering*/
 function draw() {
-    projectionMatrix = new Matrix4();
-    modelMatrix = new Matrix4();
+        projectionMatrix = new Matrix4();
+        modelMatrix = new Matrix4();
 
-    projectionMatrix.setPerspective(45, 1, 1, 10);
-    modelMatrix.setTranslate(0, 0, -modelTranslationZ);
-    modelMatrix.rotate(modelRotationX, 1, 0, 0);
-    modelMatrix.rotate(modelRotationY, 0, 1, 0);
+        projectionMatrix.setPerspective(45, 1, 1, 10);
+        modelMatrix.setTranslate(0, 0, -modelTranslationZ);
+        modelMatrix.rotate(modelRotationX, 1, 0, 0);
+        modelMatrix.rotate(modelRotationY, 0, 1, 0);
 
-    gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix.elements);
-    gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix.elements);
+        gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix.elements);
+        gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix.elements);
 
-    gl.uniform4f(lightPositionLocation, lightPositionX, lightPositionY, lightPositionZ, 1);
-    gl.uniform3f(lightColorLocation, 1.0, 1.0, 1.0);
-    gl.uniform3f(objectColorLocation, 0.8, 0.8, 0.8);
+        gl.uniform4f(lightPositionLocation, lightPositionX, lightPositionY, lightPositionZ, 1);
+        gl.uniform3f(lightColorLocation, 1.0, 1.0, 1.0);
+        gl.uniform3f(modelColorLocation, 0.8, 0.8, 0.8);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.vertexAttribPointer(vertexPositionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(vertexPositionLocation, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer)
-    gl.vertexAttribPointer(vertexNormalLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        gl.vertexAttribPointer(vertexNormalLocation, 3, gl.FLOAT, false, 0, 0);
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+        gl.vertexAttribPointer(vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
-    gl.enable(gl.DEPTH_TEST);
+        gl.bindTexture(gl.TEXTURE_2D, modelTexture);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl.drawElements(gl.TRIANGLES, triangleArray.length, gl.UNSIGNED_SHORT, 0);
-}
-/*Rendering*/
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleBuffer)
+
+        gl.drawElements(gl.TRIANGLES, triangleArray.length, gl.UNSIGNED_SHORT, 0);
+    }
+    /*Rendering*/
 
 function slider() {
     modelTranslationZ = parseFloat(document.getElementById("modelTranslationZInput").value);
