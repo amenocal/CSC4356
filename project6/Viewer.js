@@ -23,39 +23,38 @@ var modelMatrix;
 
 var lightPositionX = 0;
 var lightPositionY = 1;
-var lightPositionZ = 0;
+var lightPositionZ = 2;
 
 var modelTexture;
 
 function onmousedown(event) {
-    dragging = true;
-    lastClientX = event.clientX;
-    lastClientY = event.clientY;
-}
-
-function onmouseup(event) {
-    dragging = false;
-}
-
-function onmousemove(event) {
-    if (dragging) {
-        modelRotationY = modelRotationY + event.clientX - lastClientX;
-        modelRotationX = modelRotationX + event.clientY - lastClientY;
-
-
-        if (modelRotationX > 90.0) {
-            modelRotationX = 90.0;
-        }
-        if (modelRotationX < -90.0) {
-            modelRotationX = -90.0;
-        }
-
-        requestAnimationFrame(draw);
+        dragging = true;
+        lastClientX = event.clientX;
+        lastClientY = event.clientY;
     }
 
-    lastClientX = event.clientX;
-    lastClientY = event.clientY;
-}
+function onmouseup(event) {
+        dragging = false;
+    }
+
+function onmousemove(event) {
+        if (dragging) {
+            modelRotationY = modelRotationY + event.clientX - lastClientX;
+            modelRotationX = modelRotationX + event.clientY - lastClientY;
+
+            if (modelRotationX > 90.0) {
+                modelRotationX = 90.0;
+            }
+            if (modelRotationX < -90.0) {
+                modelRotationX = -90.0;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        lastClientX = event.clientX;
+        lastClientY = event.clientY;
+    }
 
 /*Interaction*/
 
@@ -63,50 +62,14 @@ function onmousemove(event) {
 var canvas;
 var gl;
 
-/*Vector Operators*/
-function addition(a, b) {
-    return [a[0] + b[0],
-        a[1] + b[1],
-        a[2] + b[2]
-    ];
-}
-
-function subtract(a, b) {
-    return [a[0] - b[0],
-        a[1] - b[1],
-        a[2] - b[2]
-    ];
-}
-
-function dot(a, b) {
-    return a[0] * b[0] +
-        a[1] * b[1] +
-        a[2] * b[2]
-}
-
-function cross(a, b) {
-    return [a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
-    ];
-}
-
-function normalize(a) {
-        var len = Math.sqrt(dot(a, a));
-
-        return [a[0] / len,
-            a[1] / len,
-            a[2] / len
-        ];
-    }
-    /*Vector Operators*/
-
+/*Flatten Function */
 function flatten(a) {
-    return a.reduce(function(b, v) {
-        b.push.apply(b, v);
-        return b
-    }, [])
-}
+        return a.reduce(function(b, v) {
+            b.push.apply(b, v);
+            return b
+        }, [])
+    }
+/*Flatten Function */
 
 function init() {
         canvas = document.getElementById('webgl');
@@ -122,7 +85,6 @@ function init() {
         modelMatrixLocation = gl.getUniformLocation(gl.program, "modelMatrix");
         lightPositionLocation = gl.getUniformLocation(gl.program, "lightPosition");
         lightColorLocation = gl.getUniformLocation(gl.program, "lightColor");
-        //objectColorLocation = gl.getUniformLocation(gl.program, "objectColor"); /*check if needed*/
         /*Shader Initialization*/
 
         /*Buffer Initialization*/
@@ -180,7 +142,7 @@ function init() {
 
         requestAnimationFrame(draw);
     }
-    /*Initialization*/
+/*Initialization*/
 
 /*Rendering*/
 function draw() {
@@ -221,16 +183,16 @@ function draw() {
     /*Rendering*/
 
 function slider() {
-    modelTranslationZ = parseFloat(document.getElementById("modelTranslationZInput").value);
-    lightPositionX = parseFloat(document.getElementById("lightPositionXInput").value);
-    lightPositionY = parseFloat(document.getElementById("lightPositionYInput").value);
-    lightPositionZ = parseFloat(document.getElementById("lightPositionZInput").value);
+        modelTranslationZ = parseFloat(document.getElementById("modelTranslationZInput").value);
+        lightPositionX = parseFloat(document.getElementById("lightPositionXInput").value);
+        lightPositionY = parseFloat(document.getElementById("lightPositionYInput").value);
+        lightPositionZ = parseFloat(document.getElementById("lightPositionZInput").value);
 
-    document.getElementById("modelTranslationZOutput").innerHTML = modelTranslationZ;
-    document.getElementById("lightPositionXOutput").innerHTML = lightPositionX;
-    document.getElementById("lightPositionYOutput").innerHTML = lightPositionY;
-    document.getElementById("lightPositionZOutput").innerHTML = lightPositionZ;
+        document.getElementById("modelTranslationZOutput").innerHTML = modelTranslationZ;
+        document.getElementById("lightPositionXOutput").innerHTML = lightPositionX;
+        document.getElementById("lightPositionYOutput").innerHTML = lightPositionY;
+        document.getElementById("lightPositionZOutput").innerHTML = lightPositionZ;
 
-    requestAnimationFrame(draw);
+        requestAnimationFrame(draw);
 
-}
+    }

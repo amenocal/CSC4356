@@ -36,32 +36,18 @@
 
         vec4 p;
         vec4 q;
-        vec3 n;
-        vec3 l;
-        vec3 v;
-        vec3 r;
-        vec3 h;
-        float d;
-        float s;
 
         void main() {
-        	p =                modelMatrix * vertexPosition;
-        	q =                modelMatrix * lightPosition;
-
+            p = modelMatrix * vertexPosition;
+            //q = modelMatrix * lightPosition; //According to the website but like better how it looks with q = lighPoistion
+            q = lightPosition;
 
             fragmentNormal = normalize(mat3(modelMatrix) * vertexNormal);
             fragmentLight = normalize(vec3(q - p));
-
-
-        	fragmentView = normalize(vec3(-p));
-        	fragmentTexCoord = vertexTexCoord;
-            //h = normalize(v+d);
-
-        	//kd = max(dot(n,d),0.0);
-        	//s = pow(max(dot(n,h),0.0),100.0);
-
-        	//fragmentColor = lightColor * (objectColor * kd + vec3(s));
-        	gl_Position = projectionMatrix*modelMatrix*vertexPosition;
+            fragmentView = normalize(vec3(-p));
+            fragmentTexCoord = vertexTexCoord;
+            
+            gl_Position = projectionMatrix * modelMatrix * vertexPosition;
         }
         /*Vertex Shader*/
     </script>
@@ -72,12 +58,23 @@
         varying vec3 fragmentNormal;
         varying vec3 fragmentLight;
         varying vec3 fragmentView;
-        varying vec2 fragmentTexCoord
+        varying vec2 fragmentTexCoord;
 
         uniform vec3 lightColor;
         uniform sampler2D modelTexture;
 
-        varying mediump vec3 fragmentColor;
+        vec3 fragmentColor;
+
+        vec3 modelColor;
+        vec3 n;
+        vec3 l;
+        vec3 v;
+        vec3 r;
+        vec3 h;
+        float d;
+        float s;
+
+
         void main() {
             n = normalize(fragmentNormal);
             l = normalize(fragmentLight);
@@ -89,7 +86,7 @@
 
             modelColor = vec3(texture2D(modelTexture, fragmentTexCoord));
             fragmentColor = lightColor * (modelColor* d + s);
-        	gl_FragColor = vec4(fragmentColor, 1.0);
+            gl_FragColor = vec4(fragmentColor, 1.0);
         }
         /*Fragment Shader*/
     </script>
@@ -122,9 +119,9 @@
         <tr>
             <td>Light Z:</td>
             <td>
-                <input id="lightPositionZInput" type="range" value="0.0" min="-5.0" max="5.0" step="0.1" oninput="slider()">
+                <input id="lightPositionZInput" type="range" value="2.0" min="-5.0" max="5.0" step="0.1" oninput="slider()">
             </td>
-            <td id="lightPositionZOutput">0</td>
+            <td id="lightPositionZOutput">2</td>
         </tr>
     </table>
     <!--Elements-->
