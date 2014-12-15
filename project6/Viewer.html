@@ -21,7 +21,6 @@
         uniform mat4 projectionMatrix;
         uniform mat4 modelMatrix;
         uniform vec4 lightPosition; 
-        //uniform vec3 objectColor; /*Check if needed*/
 
         attribute vec4 vertexPosition;
         attribute vec3 vertexNormal;
@@ -73,7 +72,6 @@
         vec3 h;
         float d;
         float s;
-
 
         void main() {
             n = normalize(fragmentNormal);

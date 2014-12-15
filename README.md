@@ -28,4 +28,12 @@ We displayed the inverted paraboloid and rendered a gird of black lines on top o
 
 Purpose of this project was to practice basic gemotry processing and shaded rendering. This program takes a table of vertices and triangles in JSON format, it calculates a smoothen normal for each vertex, render the resulting data using basic lightning, and allow the user to tumble the shaded model using the mouse.
 
-Bunny 3D image. 
+Bunny 3D image.
+
+##Prog 6: Textured Model Viewer
+
+Purpose of this project is to practice per-fragment shading and texturing. This application will take tables of vertices, normals, texture coordinates, and triangles in JSON format. Render this data using per-fragment illumination with texturing and a point light source. 
+
+It Allows the user to tumble the shaded model by dragging in the canvas.
+
+Output: A treasure chest. 
